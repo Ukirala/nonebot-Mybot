@@ -7,7 +7,7 @@ from loguru import logger
 # TODO 使用 config provider 提供配置
 headers = {
     "Content-Type": "application/json",
-    "Authorization": f"Bearer sk-8wP677r6ou6TqK4G025a1cF4B80f4d7c8a6590219d7176B7"
+    "Authorization": f"Bearer "
 }
 
 data = {

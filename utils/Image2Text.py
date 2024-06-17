@@ -6,7 +6,7 @@ import time
 import ssl
 from datetime import datetime
 from loguru import logger
-from .config import config
+
 
 # 缓存图片的目录
 IMAGE_CACHE_DIR = "mybot/plugins/chatgpt/image_cache"
@@ -15,6 +15,7 @@ IMAGE_CACHE_DIR = "mybot/plugins/chatgpt/image_cache"
 if not os.path.exists(IMAGE_CACHE_DIR):
     os.makedirs(IMAGE_CACHE_DIR)
     logger.info(f"创建缓存目录: {IMAGE_CACHE_DIR}")
+
 
 async def clear_image_cache():
     """
