@@ -13,7 +13,7 @@ class Weather:
                           'Chrome/126.0.0.0 Safari/537.36'
         }
 
-    async def get_ticket(self):
+    async def get_ticket(self) -> None:
         async with aiohttp.ClientSession() as session:
             try:
                 async with session.get(self.index_url, headers=self.headers) as response:
@@ -27,7 +27,7 @@ class Weather:
             except Exception as e:
                 logger.error(f"Exception occurred while getting ticket: {e}")
 
-    async def get_weather(self):
+    async def get_weather(self) -> None:
         async with aiohttp.ClientSession() as session:
             try:
                 # TODO 使用 config provide 提供经纬度

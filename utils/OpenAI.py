@@ -1,3 +1,5 @@
+from typing import Any
+
 import aiohttp
 import json
 from loguru import logger
@@ -5,7 +7,7 @@ from loguru import logger
 # TODO 使用 config provider 提供配置
 headers = {
     "Content-Type": "application/json",
-    "Authorization": f"Bearer "
+    "Authorization": f"Bearer sk-8wP677r6ou6TqK4G025a1cF4B80f4d7c8a6590219d7176B7"
 }
 
 data = {
@@ -61,7 +63,7 @@ async def call_openai_api_stream(context: str):
                                 continue
                 else:
                     result = await response.json()
-                    logger.error("请求失败: {result.get('error', {}).get('message', '未知错误')}")
+                    logger.error(f"请求失败: {result.get('error', {}).get('message', '未知错误')}")
         except Exception as e:
             logger.error(f"请求出错: {str(e)}")
 
@@ -72,7 +74,7 @@ class ResponseReader:
         self.current_response = ""
         self.last_position = 0
 
-    async def read(self):
+    async def read(self) -> Any | None:
         try:
             self.current_response = await self.generator.__anext__()
         except StopAsyncIteration:
@@ -82,7 +84,7 @@ class ResponseReader:
         self.last_position = len(self.current_response)
         return new_content
 
-    def get_sentences(self, content):
+    def get_sentences(self, content) -> tuple[list[str], str]:
         end_chars = ['。', '！', '？', '.', '?', '!']
         sentences = []
         start = 0
