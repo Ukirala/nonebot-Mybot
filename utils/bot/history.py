@@ -1,5 +1,7 @@
 from datetime import datetime
-from nonebot.adapters.onebot.v11 import Bot, GroupMessageEvent, PrivateMessageEvent
+
+from nonebot.adapters.onebot.v11 import (Bot, GroupMessageEvent,
+                                         PrivateMessageEvent)
 from nonebot.adapters.onebot.v11.exception import ActionFailed
 
 

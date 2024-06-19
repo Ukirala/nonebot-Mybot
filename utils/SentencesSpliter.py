@@ -1,5 +1,6 @@
-import spacy
 import gc
+
+import spacy
 from loguru import logger
 
 

@@ -1,7 +1,7 @@
 from nonebot import on_message
-from nonebot.plugin import PluginMetadata
 from nonebot.adapters.onebot.v11 import GroupMessageEvent, PrivateMessageEvent
 from nonebot.log import logger
+from nonebot.plugin import PluginMetadata
 
 # from .history import get_history_messages, format_history_messages
 

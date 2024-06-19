@@ -1,7 +1,7 @@
 from nonebot import on_command
-from nonebot.plugin import PluginMetadata
 from nonebot.adapters.onebot.v11 import GroupMessageEvent, PrivateMessageEvent
 from nonebot.log import logger
+from nonebot.plugin import PluginMetadata
 
 __plugin_meta__ = PluginMetadata(
     name="Admin Command Plugin",

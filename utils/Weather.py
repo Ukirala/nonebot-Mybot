@@ -1,6 +1,7 @@
-import aiohttp
 import asyncio
 import time
+
+import aiohttp
 from loguru import logger
 
 
