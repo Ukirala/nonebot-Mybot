@@ -35,6 +35,7 @@ async def clear_image_cache():
         logger.info(f"清理缓存完成，删除文件数: {deleted_files}, 总大小: {deleted_size} bytes")
         await asyncio.sleep(600)
 
+
 async def download_image(url: str) -> str:
     """
     下载图片到本地的函数构成，使用时间戳命名文件以确保唯一性。
@@ -119,9 +120,3 @@ async def image_to_text(image_url: str) -> str:
         except Exception as e:
             logger.error(f"请求出错: {e}")
             return "[image 转文字失败]"
-
-
-@nonebot.get_driver().on_startup
-async def startup():
-    asyncio.create_task(clear_image_cache())
-
