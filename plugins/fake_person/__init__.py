@@ -17,8 +17,10 @@ fake_person = on_message(priority=15)
 
 @fake_person.handle()
 async def _(event: GroupMessageEvent | PrivateMessageEvent):
-    if event.group_id:
-        logger.debug(f"接收到群聊 {event.group_id} 成员: {event.user_id} 的消息")
-    else:
-        logger.debug(f"接收到 {event.user_id} 的消息")
-    logger.success("Fake_Person Plugin: show_help")
+    match event:
+        case GroupMessageEvent():
+            logger.info(f"接收到群聊 {event.group_id} 成员: {event.user_id} 的消息")
+        case PrivateMessageEvent():
+            logger.info(f"接收到 {event.user_id} 的消息")
+        case _:
+            return

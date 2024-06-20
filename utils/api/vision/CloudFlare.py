@@ -5,8 +5,7 @@ import time
 from datetime import datetime
 
 import aiohttp
-import nonebot
-from loguru import logger
+from nonebot.log import logger
 
 # 缓存图片的目录
 IMAGE_CACHE_DIR = "mybot/plugins/chatgpt/image_cache"
