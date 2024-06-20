@@ -1,6 +1,9 @@
 from datetime import datetime
-from nonebot.adapters.onebot.v11 import Bot, GroupMessageEvent, PrivateMessageEvent
+
+from nonebot.adapters.onebot.v11 import (Bot, GroupMessageEvent,
+                                         PrivateMessageEvent)
 from nonebot.adapters.onebot.v11.exception import ActionFailed
+
 
 async def get_history_messages(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent, count: int):
     history = []
@@ -29,6 +32,7 @@ async def get_history_messages(bot: Bot, event: GroupMessageEvent | PrivateMessa
         if e.retcode not in [100, 101]:
             raise e
     return history
+
 
 def format_history_messages(messages):
     formatted = ""
