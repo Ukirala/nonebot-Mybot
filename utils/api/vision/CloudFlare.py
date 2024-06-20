@@ -3,7 +3,7 @@ import os
 import ssl
 import time
 from datetime import datetime
-
+from core.ConfigProvider import Cloudflare
 import aiohttp
 from nonebot.log import logger
 
@@ -83,9 +83,9 @@ async def image_to_text(image_url: str) -> str:
     if not image_path:
         return "[image 转文字失败]"
 
-    url = f"https://api.cloudflare.com/client/v4/accounts/{config.cloudflare_account_id}/ai/run/@cf/llava-hf/llava-1.5-7b-hf"
+    url = f"https://api.cloudflare.com/client/v4/accounts/{Cloudflare.AccountID}/ai/run/@cf/llava-hf/llava-1.5-7b-hf"
     headers = {
-        "Authorization": f"Bearer {config.cloudflare_api_key}",
+        "Authorization": f"Bearer {Cloudflare.API_Key}",
         "Content-Type": "application/json"
     }
 

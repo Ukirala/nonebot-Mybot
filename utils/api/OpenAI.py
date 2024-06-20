@@ -1,13 +1,13 @@
 import json
 from typing import Any
-
+from core.ConfigProvider import OpenAI
 import aiohttp
 from loguru import logger
 
 # TODO 使用 config provider 提供配置
 headers = {
     "Content-Type": "application/json",
-    "Authorization": f"Bearer "
+    "Authorization": f"Bearer {OpenAI.API_KEY}"
 }
 
 data = {
@@ -16,7 +16,6 @@ data = {
     "temperature": 0.7,
     "stream": True
 }
-openai_base_url = "https://api.daifuku.asia/v1/chat/completions"
 
 
 async def call_openai_api(context: str) -> str:
@@ -24,7 +23,7 @@ async def call_openai_api(context: str) -> str:
 
     async with aiohttp.ClientSession() as session:
         try:
-            async with session.post(url=openai_base_url, headers=headers,
+            async with session.post(url=OpenAI.BASE_URL, headers=headers,
                                     data=json.dumps(data)) as response:
                 result = await response.json()
                 if response.status == 200:

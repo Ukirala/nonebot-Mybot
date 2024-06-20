@@ -9,14 +9,14 @@ class MessageQueue:
 
     def add_message(self, message_id: str, _message: str) -> str:
         if message_id in self.buffer:
-            # 如果消息ID已经存在，则更新消息
+            # if Message ID exists, update the message
             self.buffer[message_id] = _message
         else:
-            # 如果消息ID不存在，则添加新消息
+            # if Message ID does not exist, add the message
             if self.count < self.size:
                 self.count += 1
             else:
-                # 环形缓冲区满时，移除最旧的消息
+                # if the buffer is full, remove the oldest message
                 oldest_id = self.order[self.head]
                 del self.buffer[oldest_id]
                 self.head = (self.head + 1) % self.size

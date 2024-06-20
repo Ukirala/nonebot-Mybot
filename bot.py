@@ -1,8 +1,10 @@
 import nonebot
 from nonebot.adapters.onebot.v11 import Adapter as ONEBOT_V11Adapter
+from core.ConfigProvider import ConfigProvider
 
 default_format = "{time} | {level} | {message}"
 
+config_provider = ConfigProvider.get_instance()
 nonebot.init()
 #  logger.add("trace.log", level="TRACE", format=default_format)
 #  输出日志到文件谨慎开启，image2text的日志非超多，不一会就能写出几百MB

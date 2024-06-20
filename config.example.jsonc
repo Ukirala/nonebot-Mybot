@@ -2,10 +2,10 @@
   "OpenAI": {
     "API_KEY": "",  // OpenAI API 密钥
     "MODEL": "gpt-4o",  // OpenAI 模型
-    "BASE_URL": "https://api.daifuku.asia/v1/chat/completions"  // OpenAI 镜像站地址
+    "BASE_URL": "api.daifuku.asia/v1/chat/completions"  // OpenAI 镜像站地址 需要有/v1/chat/completions 无需https://
   },
   "Spacy": {
-      "MODEL": "en_core_web_sm"  // Spacy 模型
+      "MODEL": "zh_core_web_trf"  // Spacy 模型
   },
   "MessageQueue": {
     "MAXQueue": 50  // 消息队列最大长度

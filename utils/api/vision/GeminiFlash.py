@@ -1,35 +1,33 @@
 import asyncio
 import base64
-import time
 import json
 import os
+import time
 from io import BytesIO
-
+from core.ConfigProvider import Google
+import aiofiles
 import httpx
 from nonebot.log import logger
-import aiofiles
 from PIL import Image
 
 
 async def download_image(img_url: str) -> str:
     logger.info(f"Downloading image from {img_url}")
-    # 创建保存目录
+
     save_dir = "cache/imgs"
     os.makedirs(save_dir, exist_ok=True)
 
     file_path = os.path.join(save_dir, f"{time.time()}.jpg")
 
-    # 使用 httpx 请求图片
     async with httpx.AsyncClient() as client:
         response = await client.get(img_url)
         if response.status_code == 200:
-            # 读取图篇内容
             img_data = response.content
 
-            # 保存图片
-            with open(file_path, 'wb') as file:
-                file.write(img_data)
-                logger.info(f"Image saved to {file_path}")
+            async with aiofiles.open(file=file_path, mode='wb') as f:
+                await f.write(img_data)
+            logger.info(f"Image saved to {file_path}")
+
             return file_path
         else:
             raise Exception(f"Failed to retrieve image. Status code: {response.status_code}")
@@ -54,8 +52,8 @@ async def process_image(file_path: str) -> str:
     return encoded_image
 
 
-async def send_request(api_key: str, encoded_image: str) -> dict:
-    url = f'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}'
+async def send_request(encoded_image: str) -> dict:
+    url = f'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={Google.API_KEY}'
     headers = {
         'Content-Type': 'application/json'
     }
@@ -99,8 +97,14 @@ async def send_request(api_key: str, encoded_image: str) -> dict:
 
 
 async def main():
-    api_key = 'AIzaSyDZgdP21rBRsNXWBeXBk8B0dQz86RT8-Hs'
-    image_path = r'D:\Py_Project\nonebot-Mybot\cache\imgs\1.png'
+    import os
+
+    from dotenv import load_dotenv
+
+    load_dotenv()
+
+    image_path = os.getenv("IMAGE_PATH")
+    api_key = os.getenv('GOOGLE_API_KEY')
 
     encoded_image = await process_image(image_path)
     response_text = await send_request(api_key, encoded_image)

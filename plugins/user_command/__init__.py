@@ -4,7 +4,9 @@ from nonebot import on_command
 from nonebot.adapters.onebot.v11 import GroupMessageEvent, PrivateMessageEvent
 from nonebot.log import logger
 from nonebot.plugin import PluginMetadata
-from utils.api.vision.GeminiFlash import download_image, process_image, send_request
+
+from utils.api.vision.GeminiFlash import (download_image, process_image,
+                                          send_request)
 
 __plugin_meta__ = PluginMetadata(
     name="User Command Plugin",
@@ -34,6 +36,6 @@ async def _(event: GroupMessageEvent | PrivateMessageEvent):
 
     img_path = await download_image(url)
     encoded_image = await process_image(img_path)
-    response_text = await send_request("AIzaSyDZgdP21rBRsNXWBeXBk8B0dQz86RT8-Hs", encoded_image)
+    response_text = await send_request(encoded_image)
 
     await vision.finish(response_text['candidates'][0]['content']['parts'][0]['text'])
