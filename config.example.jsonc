@@ -5,7 +5,7 @@
     "BASE_URL": "api.daifuku.asia/v1/chat/completions"  // OpenAI 镜像站地址 需要有/v1/chat/completions 无需https://
   },
   "Spacy": {
-      "MODEL": "zh_core_web_trf"  // Spacy 模型
+      "MODEL": "zh_core_web_sm"  // Spacy 模型
   },
   "MessageQueue": {
     "MAXQueue": 50  // 消息队列最大长度
@@ -16,5 +16,6 @@
   },
   "Google": {
     "API_KEY": ""  // Google API 密钥
-  }
+  },
+  ""
 }

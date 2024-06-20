@@ -1,10 +1,11 @@
 import json
 from typing import Any
-from core.ConfigProvider import OpenAI
+
 import aiohttp
 from loguru import logger
 
-# TODO 使用 config provider 提供配置
+from core.ConfigProvider import OpenAI
+
 headers = {
     "Content-Type": "application/json",
     "Authorization": f"Bearer {OpenAI.API_KEY}"
@@ -14,16 +15,15 @@ data = {
     "model": "gpt-4o",
     "max_tokens": 1000,
     "temperature": 0.7,
-    "stream": True
 }
 
 
 async def call_openai_api(context: str) -> str:
-    data["messages"] = [{"role": "user", "content": context}]
+    data["messages"] = [{"role": "user", "content": context+"使用20个字简介即可"}]
 
     async with aiohttp.ClientSession() as session:
         try:
-            async with session.post(url=OpenAI.BASE_URL, headers=headers,
+            async with session.post(url="https://"+OpenAI.BASE_URL, headers=headers,
                                     data=json.dumps(data)) as response:
                 result = await response.json()
                 if response.status == 200:
@@ -37,11 +37,12 @@ async def call_openai_api(context: str) -> str:
 
 async def call_openai_api_stream(context: str):
     data["messages"] = [{"role": "user", "content": context}]
+    data["stream"] = True
     full_response = ""
 
     async with aiohttp.ClientSession() as session:
         try:
-            async with session.post(url=openai_base_url, headers=headers,
+            async with session.post(url="https://"+OpenAI.BASE_URL, headers=headers,
                                     data=json.dumps(data)) as response:
                 if response.status == 200:
                     async for line in response.content:

@@ -1,7 +1,8 @@
 import json
-import re
 import os
+import re
 from typing import Union
+
 import aiofiles
 
 comment_re = re.compile(r'(?<!\\)//.*?$|\/\*(\s|\S)*?\*/', re.MULTILINE)
