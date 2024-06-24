@@ -6,7 +6,7 @@ from nonebot.log import logger
 from nonebot.plugin import PluginMetadata
 
 from utils.api.OpenAI import OpenAIAPI
-from utils.SentencesSpliter import SentencesSpliter
+from utils.SentencesSpliter import SentencesSpliterManager
 
 __plugin_meta__ = PluginMetadata(
     name="Fake_Person Plugin",
@@ -33,7 +33,7 @@ async def _(event: GroupMessageEvent | PrivateMessageEvent):
     if rand <= 0.2:
         logger.success("触发伪人")
         res = await OpenAIAPI.call_openai_api(event.get_plaintext())
-        text = SentencesSpliter.split_text(res)
+        text = SentencesSpliterManager.split_text(res)
 
         for _ in text:
             if _.strip() == "":

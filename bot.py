@@ -6,7 +6,7 @@ from nonebot.adapters.onebot.v11 import Adapter as ONEBOT_V11Adapter
 from nonebot.log import logger
 
 from core.ConfigProvider import ConfigProvider
-from utils.SentencesSpliter import SentencesSpliter
+from utils.SentencesSpliter import SentencesSpliterManager
 from utils.Weather import Weather
 
 
@@ -15,10 +15,6 @@ from utils.Weather import Weather
 async def load_config():
     config_provider = ConfigProvider.get_instance()
     config_provider.load_config()
-
-
-async def load_model():
-    SentencesSpliter.load_model()
 
 
 async def main():
@@ -30,11 +26,7 @@ async def main():
     logger.info("加载配置文件...")
     tasks.append(asyncio.create_task(load_config()))
 
-    logger.info("加载分句器模型...")
-    tasks.append(asyncio.create_task(load_model()))
-
     await asyncio.gather(*tasks)
-
     random.seed(await Weather.get_seed())
 
     logger.info("启动...")
@@ -42,6 +34,11 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
+    logger.info("加载分句器模型...")
+    if SentencesSpliterManager.initialize_model():
+        logger.info("分句器模型加载成功！")
+
     nonebot.init()
 
     driver = nonebot.get_driver()
