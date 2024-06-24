@@ -5,7 +5,7 @@ from nonebot.adapters.onebot.v11 import GroupMessageEvent, PrivateMessageEvent
 from nonebot.log import logger
 from nonebot.plugin import PluginMetadata
 
-from utils.api.OpenAI import call_openai_api
+from utils.api.OpenAI import OpenAIAPI
 from utils.SentencesSpliter import SentencesSpliter
 
 __plugin_meta__ = PluginMetadata(
@@ -32,7 +32,7 @@ async def _(event: GroupMessageEvent | PrivateMessageEvent):
 
     if rand <= 0.2:
         logger.success("触发伪人")
-        res = await call_openai_api(event.get_plaintext())
+        res = await OpenAIAPI.call_openai_api(event.get_plaintext())
         text = SentencesSpliter.split_text(res)
 
         for _ in text:
