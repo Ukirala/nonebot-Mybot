@@ -36,4 +36,6 @@ async def _(event: GroupMessageEvent | PrivateMessageEvent):
         text = SentencesSpliter.split_text(res)
 
         for _ in text:
+            if _.strip() == "":
+                continue
             await fake_person.send(_)

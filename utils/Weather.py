@@ -77,13 +77,3 @@ class Weather:
                         logger.error(f"Failed to get weather, status code: {response.status}")
             except Exception as e:
                 logger.error(f"Exception occurred while getting weather: {e}")
-
-
-async def main():
-    await Weather.get_ticket()
-    seed = await Weather.get_seed()
-    print(seed)
-    del Weather
-
-if __name__ == '__main__':
-    asyncio.run(main())

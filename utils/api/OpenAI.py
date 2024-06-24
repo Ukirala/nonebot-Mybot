@@ -8,7 +8,7 @@ from core.ConfigProvider import OpenAI
 
 headers = {
     "Content-Type": "application/json",
-    "Authorization": f"Bearer {OpenAI.API_KEY}"
+    "Authorization": f"Bearer {OpenAI.APIKey}"
 }
 
 data = {
@@ -19,15 +19,19 @@ data = {
 
 
 async def call_openai_api(context: str) -> str:
-    data["messages"] = [{"role": "user", "content": context+"使用20个字简介即可"}]
+    data["messages"] = [{"role": "user", "content": context}]
 
     async with aiohttp.ClientSession() as session:
         try:
-            async with session.post(url="https://"+OpenAI.BASE_URL, headers=headers,
-                                    data=json.dumps(data)) as response:
+            async with session.post(url="https://" if OpenAI.Https else "http://"
+                                                                        + OpenAI.BaseUrl + "/v1/chat/completions",
+                                    headers=headers,
+                                    json=data) as response:
                 result = await response.json()
+
                 if response.status == 200:
-                    return result["choices"][0]["message"]["content"].strip()
+                    return result["choices"][0]["message"]["content"][1]["text"].get("content", "未响应任何值").strip()
+                    # return result["choices"][0]["message"]["content"].strip()
                 else:
                     return f"请求失败: {result.get('error', {}).get('message', '未知错误')}"
         except Exception as e:
@@ -42,7 +46,8 @@ async def call_openai_api_stream(context: str):
 
     async with aiohttp.ClientSession() as session:
         try:
-            async with session.post(url="https://"+OpenAI.BASE_URL, headers=headers,
+            async with session.post(url="https://" if OpenAI.Https else "http://"
+                                                                        + OpenAI.BaseUrl, headers=headers,
                                     data=json.dumps(data)) as response:
                 if response.status == 200:
                     async for line in response.content:
@@ -91,7 +96,7 @@ class ResponseReader:
 
         for idx, char in enumerate(content):
             if char in end_chars:
-                sentences.append(content[start:idx+1].strip())
+                sentences.append(content[start:idx + 1].strip())
                 start = idx + 1
 
         return sentences, content[start:]
@@ -114,6 +119,8 @@ async def main():
         for sentence in sentences:
             logger.debug(sentence)
 
+
 if __name__ == '__main__':
     import asyncio
+
     asyncio.run(main())
