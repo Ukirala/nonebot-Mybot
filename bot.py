@@ -1,5 +1,6 @@
 import asyncio
 import random
+import sys
 
 import nonebot
 from nonebot.adapters.onebot.v11 import Adapter as ONEBOT_V11Adapter
@@ -9,9 +10,17 @@ from core.ConfigProvider import ConfigProvider
 from utils.SentencesSpliter import SentencesSpliterManager
 from utils.Weather import Weather
 
+log_format = (
+    "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | "
+    "<level>{level}</level> |"
+    "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>"
+)
 
-#  logger.add("trace.log", level="TRACE", format=default_format)
-#  输出日志到文件谨慎开启，image2text的日志非超多，不一会就能写出几百MB
+# 添加一个控制台输出，并设置格式和颜色
+logger.remove()  # 移除默认的日志配置
+logger.add(sys.stdout, format=log_format, level="DEBUG")
+
+
 async def load_config():
     config_provider = ConfigProvider.get_instance()
     config_provider.load_config()
