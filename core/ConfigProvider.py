@@ -38,6 +38,7 @@ class Google:
 class Bot:
     AdminID: Union[int, None] = None
     IsCrossGroup: Union[bool, None] = None
+    RandomReply: Union[int, None] = None
 
 
 class ConfigFileNotFoundException(Exception):
@@ -60,15 +61,17 @@ def get_class_by_name(class_name: str):
             return Cloudflare
         case 'Google':
             return Google
+        case 'Bot':
+            return Bot
         case _:
             return None
 
 
 class ConfigProvider:
     _instance = None
-    VALID_CLASS_NAMES: list = ['OpenAI', 'Spacy', 'MessageQueue', 'Cloudflare', 'Google']
+    VALID_CLASS_NAMES: list = ['OpenAI', 'Spacy', 'MessageQueue', 'Cloudflare', 'Google', 'Bot']
     VALID_ATTR_NAMES: list = ['Https', 'APIKey', 'MODEL', 'BaseUrl', 'ENABLE', 'MaxQueueSize', 'AccountID', 'AdminID',
-                              'IsCrossGroup']
+                              'IsCrossGroup', 'RandomReply']
     config: dict = {}
 
     def __init__(self):
@@ -122,6 +125,7 @@ class ConfigProvider:
 
         Bot.AdminID = cls.config.get('Bot', {}).get('AdminID', None)
         Bot.IsCrossGroup = cls.config.get('Bot', {}).get('IsCrossGroup', False)
+        Bot.RandomReply = cls.config.get('Bot', {}).get('RandomReply', 20)
 
     @classmethod
     async def change_config(cls, class_name: str, key: str, value: Union[str, int, bool]) -> bool:

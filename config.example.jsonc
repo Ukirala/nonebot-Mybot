@@ -23,6 +23,7 @@
   },
   "Bot": {
     "AdminID": 123456789, // 管理员QQ号
-    "IsCrossGroup": false  // 是否开启跨群
+    "IsCrossGroup": false,  // 是否开启跨群
+    "RandomReply": 10 // 随机回复概率
   }
 }
