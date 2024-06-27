@@ -1,4 +1,3 @@
-import asyncio
 import base64
 import json
 import os
@@ -37,7 +36,7 @@ async def download_image(img_url: str) -> str:
 
 async def process_image(file_path: str) -> str:
     logger.info(f"Processing image {file_path}")
-    # 打开并调整图像大小
+
     async with aiofiles.open(file_path, 'rb') as image_file:
         img = Image.open(BytesIO(await image_file.read()))
         img_resized = img.resize((512, int(img.height * 512 / img.width)))
@@ -45,7 +44,7 @@ async def process_image(file_path: str) -> str:
         if img_resized.mode != 'RGB':
             img_resized = img_resized.convert('RGB')
 
-        # 将调整大小后的图像保存到内存中并进行 Base64 编码
+        # save image to buffer
         buffered = BytesIO()
         img_resized.save(buffered, format="JPEG")
         encoded_image = base64.b64encode(buffered.getvalue()).decode('utf-8')
@@ -55,7 +54,7 @@ async def process_image(file_path: str) -> str:
 
 
 async def send_request(encoded_image: str) -> dict:
-    url = f'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={Google.API_KEY}'
+    url = f'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={Google.APIKey}'
     headers = {
         'Content-Type': 'application/json'
     }
@@ -96,24 +95,3 @@ async def send_request(encoded_image: str) -> dict:
     except Exception as e:
         logger.error(f"An unexpected error occurred: {e}")
         raise
-
-
-async def main():
-    import os
-
-    from dotenv import load_dotenv
-
-    load_dotenv()
-
-    image_path = os.getenv("IMAGE_PATH")
-    api_key = os.getenv('GOOGLE_API_KEY')
-
-    encoded_image = await process_image(image_path)
-    response_text = await send_request(api_key, encoded_image)
-
-    print(response_text['candidates'][0]['content']['parts'][0]['text'])
-
-
-if __name__ == '__main__':
-    # 运行主异步函数
-    asyncio.run(main())

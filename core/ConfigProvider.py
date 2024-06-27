@@ -5,42 +5,76 @@ from typing import Union
 
 import aiofiles
 
-comment_re = re.compile(r'(?<!\\)//.*?$|\/\*(\s|\S)*?\*/', re.MULTILINE)
+comment_re = re.compile(r'(?<!\\)//.*?$|/\*(\s|\S)*?\*/', re.MULTILINE)
 
 
 class OpenAI:
-    API_KEY: Union[str, None] = None
-    MODEL: Union[str, None] = None
-    BASE_URL: Union[str, None] = None
+    Https: bool = True
+    APIKey: Union[str, None] = None
+    MODEL: Union[str, None] = "gpt-3.5-turbo"
+    BaseUrl: Union[str, None] = None
 
 
 class Spacy:
+    ENABLE: bool = True
     MODEL: Union[str, None] = None
 
 
 class MessageQueue:
-    MAXQueueSize: Union[int, None] = None
+    MaxQueueSize: Union[int, None] = None
 
 
 class Cloudflare:
+    ENABLE: bool = True
     AccountID: Union[str, None] = None
-    API_Key: Union[str, None] = None
+    APIKey: Union[str, None] = None
 
 
 class Google:
-    API_KEY: Union[str, None] = None
+    ENABLE: bool = True
+    APIKey: Union[str, None] = None
+
+
+class Bot:
+    AdminID: Union[int, None] = None
+    IsCrossGroup: Union[bool, None] = None
 
 
 class ConfigFileNotFoundException(Exception):
     pass
 
 
+class ConfigKeyTypeNotFoundException(Exception):
+    pass
+
+
+def get_class_by_name(class_name: str):
+    match class_name:
+        case 'OpenAI':
+            return OpenAI
+        case 'Spacy':
+            return Spacy
+        case 'MessageQueue':
+            return MessageQueue
+        case 'Cloudflare':
+            return Cloudflare
+        case 'Google':
+            return Google
+        case _:
+            return None
+
+
 class ConfigProvider:
     _instance = None
-    VALID_CLASS_NAMES = ['OpenAI', 'Spacy', 'MessageQueue', 'Cloudflare', 'Google']
+    VALID_CLASS_NAMES: list = ['OpenAI', 'Spacy', 'MessageQueue', 'Cloudflare', 'Google']
+    VALID_ATTR_NAMES: list = ['Https', 'APIKey', 'MODEL', 'BaseUrl', 'ENABLE', 'MaxQueueSize', 'AccountID', 'AdminID',
+                              'IsCrossGroup']
+    config: dict = {}
 
     def __init__(self):
-        self.config: dict = {}
+        for class_name in self.VALID_CLASS_NAMES:
+            self.config.setdefault(class_name, {})
+
         self.load_config()
 
     @classmethod
@@ -49,14 +83,12 @@ class ConfigProvider:
             cls._instance = cls()
         return cls._instance
 
-    def load_config(self):
+    @classmethod
+    def load_config(cls):
         if not os.path.exists('./config.jsonc'):
-            raise ConfigFileNotFoundException("Configuration file 'config.jsonc' not found")
+            raise ConfigFileNotFoundException("Config file 'config.jsonc' not found")
 
-        for class_name in self.VALID_CLASS_NAMES:
-            self.config.setdefault(class_name, {})
-
-        # if config.future exists, rename it to config.jsonc
+        # if config.future exists, rename to config.jsonc
         if os.path.exists('./config.future'):
             os.replace('./config.future', './config.jsonc')
 
@@ -65,42 +97,38 @@ class ConfigProvider:
 
         # remove comments
         json_data = comment_re.sub('', jsonc_data)
-        self.config = json.loads(json_data)
+        cls.config = json.loads(json_data)
 
         # set class attributes
-        OpenAI.API_KEY = self.config.get('OpenAI', {}).get('API_KEY', None)
-        OpenAI.MODEL = self.config.get('OpenAI', {}).get('MODEL', None)
-        OpenAI.BASE_URL = self.config.get('OpenAI', {}).get('BASE_URL', None)
+        OpenAI.Https = cls.config.get('OpenAI', {}).get('Https', True)
+        OpenAI.APIKey = cls.config.get('OpenAI', {}).get('APIKey', None)
+        OpenAI.BaseUrl = cls.config.get('OpenAI', {}).get('BaseUrl', None)
+        OpenAI.MODEL = cls.config.get('OpenAI', {}).get('MODEL', "gpt-3.5-turbo")
 
-        Spacy.MODEL = self.config.get('Spacy', {}).get('MODEL', None)
+        Spacy.ENABLE = cls.config.get('Spacy', {}).get('ENABLE', True)
+        if Spacy.ENABLE:
+            Spacy.MODEL = cls.config.get('Spacy', {}).get('MODEL', None)
 
-        MessageQueue.MAXQueueSize = self.config.get('MessageQueue', {}).get('MAXQueue', None)
+        MessageQueue.MaxQueueSize = cls.config.get('MessageQueue', {}).get('MaxQueueSize', 50)
 
-        Cloudflare.AccountID = self.config.get('Cloudflare', {}).get('AccountID', None)
-        Cloudflare.API_Key = self.config.get('Cloudflare', {}).get('API_Key', None)
+        Cloudflare.ENABLE = cls.config.get('Cloudflare', {}).get('ENABLE', True)
+        if Cloudflare.ENABLE:
+            Cloudflare.AccountID = cls.config.get('Cloudflare', {}).get('AccountID', None)
+            Cloudflare.APIKey = cls.config.get('Cloudflare', {}).get('APIKey', None)
 
-        Google.API_KEY = self.config.get('Google', {}).get('API_KEY', None)
+        Google.ENABLE = cls.config.get('Google', {}).get('ENABLE', True)
+        if Google.ENABLE:
+            Google.APIKey = cls.config.get('Google', {}).get('APIKey', None)
 
-    def get_class_by_name(self, class_name):
-        match class_name:
-            case 'OpenAI':
-                return OpenAI
-            case 'Spacy':
-                return Spacy
-            case 'MessageQueue':
-                return MessageQueue
-            case 'Cloudflare':
-                return Cloudflare
-            case 'Google':
-                return Google
-            case _:
-                return None
+        Bot.AdminID = cls.config.get('Bot', {}).get('AdminID', None)
+        Bot.IsCrossGroup = cls.config.get('Bot', {}).get('IsCrossGroup', False)
 
-    async def change_config(self, class_name: str, key: str, value: Union[str, int]) -> bool:
-        if class_name not in self.VALID_CLASS_NAMES:
+    @classmethod
+    async def change_config(cls, class_name: str, key: str, value: Union[str, int, bool]) -> bool:
+        if class_name not in cls.VALID_CLASS_NAMES:
             return False
 
-        class_obj = self.get_class_by_name(class_name)
+        class_obj = get_class_by_name(class_name)
         if class_obj is None:
             return False
 
@@ -111,39 +139,13 @@ class ConfigProvider:
         current_type = type(getattr(class_obj, key))
         new_type = type(value)
         if current_type != new_type:
-            return False
+            raise TypeError(f"Type mismatch: {current_type} != {new_type}")
 
         # update config
         setattr(class_obj, key, value)
-        self.config[class_name][key] = value
+        cls.config[class_name][key] = value
 
         async with aiofiles.open('./config.future', 'w', encoding='utf-8') as future_file:
-            await future_file.write(json.dumps(self.config, indent=4))
+            await future_file.write(json.dumps(cls.config, indent=4))
 
         return True
-
-
-if __name__ == "__main__":
-    config_provider = ConfigProvider()
-    # 通过 ConfigProvider 获取配置
-    print(OpenAI.API_KEY)
-    print(OpenAI.MODEL)
-    print(OpenAI.BASE_URL)
-    print(Spacy.MODEL)
-    print(MessageQueue.MAXQueueSize)
-    print(Cloudflare.AccountID)
-    print(Cloudflare.API_Key)
-    print(Google.API_KEY)
-
-
-    async def example():
-        try:
-            result = await config_provider.change_config('Spacy', 'MODEL', 'zh_core_web_trf')
-            print(f"Config change result: {result}")
-        except Exception as e:
-            print(f"Error changing config: {e}")
-
-
-    import asyncio
-
-    asyncio.run(example())
